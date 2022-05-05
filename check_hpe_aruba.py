@@ -33,12 +33,18 @@ helper.parse_arguments()
 
 # Get the options
 host, version, community = get_common_options(helper)
-secname, seclevel, authproto, authpass, privproto, privpass  = helper.options.secname, \
+secname, seclevel, authproto, authpass, privproto, privpass, verbose = helper.options.secname, \
     helper.options.seclevel, \
     helper.options.authproto, \
     helper.options.authpass, \
     helper.options.privproto, \
-    helper.options.privpass
+    helper.options.privpass, \
+    helper.options.verbose
+
+if verbose != None:
+    if verbose>3:
+        verbose=3
+    print "verbosity level = %i\n"%(verbose)
 
 # States definitions
 #https://www.circitor.fr/Mibs/Mib/H/HP-VSF-VC-MIB.mib
@@ -51,36 +57,35 @@ translate_hpicfVsfVCOperStatus = {
               4 : 'fragmentActive'
               }
 
-#hpicfVsfVCAdminStatus   OBJECT-TYPE
-#         SYNTAX      INTEGER {
-#                      enable  (1),
-#                      disable (2)
-#                   }
-#         MAX-ACCESS  read-write
-#         STATUS      current
-#         DESCRIPTION
-#               "The administrative status of the VSF virtual chassis. When set to
-#                enable (1), this object enables VSF on the switch and on the
-#                discovered members. Setting this to disable (2) disables VSF
-#                only on the standalone switch. Enabling or disabling VSF triggers
-#                a reboot of the VSF switch."
-#         ::= { hpicfVsfVCConfig 3 }
-#
-#
-#hpicfVsfVCMemberState OBJECT-TYPE
-#        SYNTAX      INTEGER  {
-#                      unusedId             (0),
-#                      missing              (1),
-#                      provision            (2),
-#                      commander            (3),
-#                      standby              (4),
-#                      member               (5),
-#                      shutdown             (6),
-#                      booting              (7),
-#                      communicationFailure (8),
-#                      incompatibleOS       (9),
-#                      unknownState         (10),
-#                      standbyBooting       (11)
+# hpicfVsfVCAdminStatus
+# DESCRIPTION
+# "The administrative status of the VSF virtual chassis. When set to
+# enable (1), this object enables VSF on the switch and on the
+# discovered members. Setting this to disable (2) disables VSF
+# only on the standalone switch. Enabling or disabling VSF triggers
+# a reboot of the VSF switch."
+translate_hpicfVsfVCAdminStatus = {
+              1 : 'enable',
+              2 : 'disable'
+              }
+
+translate_hpicfVsfVCMemberState = {
+              0 : 'unusedId',
+              1 : 'missing',
+              2 : 'provision',
+              3 : 'commander',
+              4 : 'standby',
+              5 : 'member',
+              6 : 'shutdown',
+              7 : 'booting',
+              8 : 'communicationFailure',
+              9 : 'incompatibleOS',
+              10 : 'unknownState',
+              11 : 'standbyBooting'
+              }
+
+
+
 
 normal_state = {
               1 : 'other',
@@ -151,6 +156,8 @@ ps_redundant_state = {
 
 
 oid_hpicfVsfVCOperStatus = '.1.3.6.1.4.1.11.2.14.11.5.1.116.1.1.2.0'
+oid_hpicfVsfVCAdminStatus = '.1.3.6.1.4.1.11.2.14.11.5.1.116.1.1.3.0'
+oid_hpicfVsfVCMemberState = '.1.3.6.1.4.1.11.2.14.11.5.1.116.1.3.1.9.0'
 
 ### from CPQSINFO-MIB
 oid_product_name = '.1.3.6.1.4.1.232.2.2.4.2.0'
@@ -435,7 +442,9 @@ if __name__ == '__main__':
     #check_global_status(temp_sens_flag,'Temperature sensors',oid_glob_temp_sens)
     #check_global_status(fan_flag,'Fan(s)',oid_glob_fan)
     #check_global_status(mem_flag,'Memory',oid_mem)
-    check_global_status(True, 'VSF VC Operational Status', oid_hpicfVsfVCOperStatus)
+    check_global_status(True, 'VSF VC Operational', oid_hpicfVsfVCOperStatus)
+    check_global_status(True, 'VSF 2', oid_hpicfVsfVCAdminStatus)
+    check_global_status(True, 'VSF 3', oid_hpicfVsfVCMemberState)
 
     # Print out plugin information and exit nagios-style
     helper.exit()
