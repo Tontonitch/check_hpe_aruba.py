@@ -1,0 +1,117 @@
+https://jira.observium.org/browse/OBS-2794
+
+
+VSF
+MIB: HP-VSF-VC-MIB (1.3.6.1.4.1.11.2.14.11.5.1.116)
+
+If AdminStatus = disable, then there is no VSF configured on the switch
+
+HP-VSF-VC-MIB::hpicfVsfVCOperStatus.0 = INTEGER: active(2)
+HP-VSF-VC-MIB::hpicfVsfVCAdminStatus.0 = INTEGER: enable(1)
+
+HP-VSF-VC-MIB::hpicfVsfVCMemberState.1 = INTEGER: commander(3)
+HP-VSF-VC-MIB::hpicfVsfVCMemberState.2 = INTEGER: standby(4)
+HP-VSF-VC-MIB::hpicfVsfVCMemberState.3 = INTEGER: member(5)
+
+Attached snmpwalk from Aruba JL256A 2930F using code WC.16.03.0006
+
+Stacking
+MIB: HP-STACK-MIB (1.3.6.1.4.1.11.2.14.11.5.1.69)
+
+If AdminStatus = disable, then there is no stacking configured on the switch
+
+HP-STACK-MIB::hpStackOperStatus.0 = INTEGER: active(2)
+HP-STACK-MIB::hpStackSwitchAdminStatus.1 = INTEGER: enable(1)
+
+HP-STACK-MIB::hpStackMemberState.1 = INTEGER: standby(4)
+HP-STACK-MIB::hpStackMemberState.2 = INTEGER: commander(3)
+
+Attached snmpwalk from Aruba JL322A 2930MF using code WC.16.04.0008
+
+All memberstates are documented in the MIBs
+
+
+
+
+https://www.circitor.fr/Mibs/Mib/H/HP-VSF-VC-MIB.mib
+
+
+hpicfVsfVCOperStatus   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                          unAvailable      (0),
+                          disabled         (1),
+                          active           (2),
+                          fragmentInactive (3),
+                          fragmentActive   (4)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+               "This is the current operational status of the VSF virtual chassis."
+         ::= { hpicfVsfVCConfig 2 }
+		 
+		 
+hpicfVsfVCAdminStatus   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      enable  (1),
+                      disable (2)
+                   }
+         MAX-ACCESS  read-write 
+         STATUS      current         
+         DESCRIPTION 
+               "The administrative status of the VSF virtual chassis. When set to 
+                enable (1), this object enables VSF on the switch and on the 
+                discovered members. Setting this to disable (2) disables VSF 
+                only on the standalone switch. Enabling or disabling VSF triggers 
+                a reboot of the VSF switch."
+         ::= { hpicfVsfVCConfig 3 }		 
+
+
+hpicfVsfVCMemberState OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                      unusedId             (0),
+                      missing              (1),
+                      provision            (2),
+                      commander            (3),
+                      standby              (4),
+                      member               (5),
+                      shutdown             (6),
+                      booting              (7),
+                      communicationFailure (8),
+                      incompatibleOS       (9),
+                      unknownState         (10),
+                      standbyBooting       (11)
+               }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  
+               "This object gives the status of the member-switch in the VSF 
+               virtual chassis. 
+
+               unusedId (0)      - The member ID does not exist. 
+               missing (1)       - An VSF virtual chassis member-switch is marked as 
+                                   missing when it becomes non-responsive. A lack of 
+                                   response from the switch means that either the 
+                                   virtual chassis link or the virtual chassis member 
+                                   has crashed. Note that it is possible to remove a 
+                                   missing member from the virtual chassis. Once removed, 
+                                   the missing member's configuration will be deleted 
+                                   from the virtual chassis configuration file.
+              provision (2)      - A member-switch that is not physically present 
+                                   but whose configuration is provisioned .
+              commander (3)      - The member-switch which is the commander of the
+                                   VSF virtual chassis.
+              standby (4)        - The member-switch which is the standby of the 
+                                   VSF virtual chassis.
+              member (5)         - The member-switch that is a part of the VSF 
+                                   virtual chassis.
+              shutdown (6)       - The member-switch is in the shut down state.
+              booting (7)        - The member-switch is booting.
+              communicationFailure (8)- The member-switch cannot be reached.
+              incompatibleOS (9) - The member-switch is running with a different 
+                                   Operating System.
+              unknownState (10)  - The state of the member-switch cannot be determined.                                      
+              standbyBooting (11)- The standby switch is currently booting up. When 
+                                   the switch finishes booting, its state will change 
+                                   to standby (4)."
+        ::= { hpicfVsfVCMemberEntry 9 } 
